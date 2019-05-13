@@ -10,7 +10,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class LocationGetter extends AsyncTask<String, Void, String> {
+public class OnlineMetroGetter extends AsyncTask<String, Void, String> {
     @Override
     protected String doInBackground(String... strings) {
         try {
@@ -43,6 +43,5 @@ public class LocationGetter extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
-        MainActivity.textView.setText(s);
     }
 }

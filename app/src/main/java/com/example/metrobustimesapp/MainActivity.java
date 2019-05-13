@@ -1,6 +1,7 @@
 package com.example.metrobustimesapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -15,6 +16,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.net.NetworkInfo;
+import android.net.ConnectivityManager;
 
 import java.util.List;
 import java.util.Locale;
@@ -24,19 +27,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     Button getLocationBtn;
     TextView locationText;
     LocationManager locationManager;
+    NetworkInfo netInfo;
+    ConnectivityManager connectMan;
 
     TextView textView;
+    TextView editStop;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
         setContentView(R.layout.activity_main);
-
-        getLocationBtn = findViewById(R.id.getLocationBtn);
-        locationText = findViewById(R.id.locationText);
-
-
-        textView = findViewById(R.id.textView);
 
         double mch_lat = 36.996165;
         double mch_long =  -122.058873;
@@ -52,11 +52,22 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         double distance_km = 6371 * d;
 
+        //Widget setup
+        getLocationBtn = findViewById(R.id.getLocationBtn);
+        locationText = findViewById(R.id.locationText);
+        editStop = findViewById(R.id.enterBusStop);
+        textView = findViewById(R.id.textView);
+
+        //Internet stuff
+        connectMan = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        netInfo = connectMan.getActiveNetworkInfo();
+
         String string_d = Double.toString(distance_km);
         textView.setText("Distance in km: "+ string_d);
 
         display_stops();
-
+        connectToMetro();
+        //get permission if not available
         if (ContextCompat.checkSelfPermission(getApplicationContext(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(getApplicationContext(),
@@ -73,10 +84,27 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         });
     }
 
+    //Author: Anthony Tom
+    //Input: view
+    //Output: Should transfer some kind of information to some database (WIP)
+    //Right now it's hard coded to the 15 bus stop. You can change it by changing the 15 that's
+    //before wd to some other bus number like 16 or 20.
+    protected void connectToMetro(){
+        netInfo = connectMan.getActiveNetworkInfo();
+        if(netInfo != null && netInfo.isConnected()){
+            OnlineMetroGetter busInfo = new OnlineMetroGetter();
+            busInfo.execute("https://www.scmtd.com/en/routes/schedule/20193/15/wd");
+        } else {
+            Toast.makeText(MainActivity.this, "NO INTERNET CONNECTION", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    //Display bus stops
     void display_stops(){
 
     }
 
+    //Get location of user
     void getLocation() {
         try {
             locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -87,6 +115,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
+    //When user moves do something
     @Override
     public void onLocationChanged(Location location) {
 
@@ -98,8 +127,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
             locationText.setText(locationText.getText() + "\n"+addresses.get(0).getAddressLine(0)+", "+
                     addresses.get(0).getAddressLine(1)+", "+addresses.get(0).getAddressLine(2));
-        }catch(Exception e)
-        {
+        }catch(Exception e) {
 
         }
 
@@ -120,6 +148,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public void onProviderDisabled(String provider) {
         Toast.makeText(MainActivity.this, "Please Enable GPS and Internet", Toast.LENGTH_SHORT).show();
     }
+
+    //Author: Anthony Tom
+    //Input: Called from pressing getAllStopsButton in activity_main
+    //Output: Sends you to ShowAllStops (will change to search bar)
+    public void getAllStops(View view) {
+        Intent intent = new Intent(Show);
+    }
+
     // location lat lng
     // sne          36.999212, -122.060613
     // science hill 37.000069, -122.062129
