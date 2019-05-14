@@ -389,5 +389,4 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         Log.d("Bus 20", Bus_20.toString());
         Log.d("Bus 20D", Bus_20D.toString());
     }
-
 }
