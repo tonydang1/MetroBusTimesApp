@@ -188,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     //Decodes the json and turns it back into a hashtable
     protected static HashMap<String, List<String>> stringToHash(String stringHash){
         Gson gson = new Gson();
-        Type type = new TypeToken<ArrayList<String>>() {}.getType();
+        Type type = new TypeToken<HashMap<String,ArrayList<String>>>() {}.getType();
         HashMap<String, List<String>> hash = gson.fromJson(stringHash, type);
         return hash;
     }
@@ -202,7 +202,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     protected void connectToMetro(View view){
         netInfo = connectMan.getActiveNetworkInfo();
         if(netInfo != null && netInfo.isConnected()){
-            new OnlineMetroGetter().execute("https://www.scmtd.com/en/routes/schedule-by-stop/"+busIDString+"#tripDiv");
+            new OnlineMetroGetter().execute("https://www.scmtd.com/en/routes/schedule-by-stop/1616/2019-05-17#tripDiv");
         } else {
             Toast.makeText(MainActivity.this, "NO INTERNET CONNECTION", Toast.LENGTH_LONG).show();
         }
