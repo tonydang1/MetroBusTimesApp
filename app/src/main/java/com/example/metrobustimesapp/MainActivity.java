@@ -202,8 +202,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     protected void connectToMetro(View view){
         dbHandler.clean();
         netInfo = connectMan.getActiveNetworkInfo();
+
+        String temp_busid = editStop.getText().toString();
+
         if(netInfo != null && netInfo.isConnected()){
-            new OnlineMetroGetter().execute("https://www.scmtd.com/en/routes/schedule-by-stop/1616/2019-05-17#tripDiv");
+            new OnlineMetroGetter().execute("https://www.scmtd.com/en/routes/schedule-by-stop/"+temp_busid+"/2019-05-17#tripDiv");
         } else {
             Toast.makeText(MainActivity.this, "NO INTERNET CONNECTION", Toast.LENGTH_LONG).show();
         }
@@ -311,6 +314,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             if(tokens[i].equals("LibertyTrip")) continue;
             if(tokens[i].equals("TresconyTrip")) continue;
             if(tokens[i].equals("MissionTrip")) continue;
+            if(tokens[i].equals("Science")) continue;
+            if(tokens[i].equals("Hill")) continue;
+            if(tokens[i].equals("Departs")) continue;
+            if(tokens[i].equals("Bay")) continue;
 
             if(tokens[i].equals("times")){
                 output += "\n";
@@ -326,8 +333,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
         // Removes Trip from Destination Time
         output = output.replace("Trip", "");
+        output = output.replace("(UCSC) D ", "");
+        output = output.replace("(UCSC) C ", "");
+        output = output.replace("(UCSC) F ", "");
 
-        //Log.d("Parse", output);
+        Log.d("Parse", output);
 
         String tempString = populateDB(output);
 
