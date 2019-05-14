@@ -105,7 +105,8 @@ public class ViewAllStopsActivity extends AppCompatActivity {
 
         //Need to add 12 to the hour
         if(amPM.matches("pm")){
-            hour += 12;
+            if(hour != 12)
+                hour += 12;
         }
 
         min += hour*60;

@@ -209,6 +209,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         netInfo = connectMan.getActiveNetworkInfo();
 
         String temp_busid = editStop.getText().toString();
+        // TODO: check if busid is empty / valid
+
+        if(temp_busid.matches("")){
+            Toast.makeText(MainActivity.this, "MUST ENTER BUSID", Toast.LENGTH_LONG).show();
+            return;
+        }
 
         if(netInfo != null && netInfo.isConnected()){
             new OnlineMetroGetter().execute("https://www.scmtd.com/en/routes/schedule-by-stop/"+temp_busid+"/2019-05-17#tripDiv");
@@ -342,6 +348,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         output = output.replace("(UCSC) D ", "");
         output = output.replace("(UCSC) C ", "");
         output = output.replace("(UCSC) F ", "");
+        output = output.replace("Watsonville Transit ", "");
+        output = output.replace("Capitola Mall Lane 1 ", "");
+        output = output.replace("Country Club ", "");
+        output = output.replace("Mountain Store ", "");
 
         Log.d("Parse", output);
 
