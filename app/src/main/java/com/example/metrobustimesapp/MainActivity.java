@@ -227,7 +227,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 Document doc = Jsoup.parse(buffer.toString());
                 Elements element = doc.select("tbody");
                 stopRow = element.text();
-                return stopRow;
+
+                String out = parseElement(stopRow);
+                return out;
 
 
             } catch (MalformedURLException e) {
