@@ -43,6 +43,7 @@ public class ViewAllStopsActivity extends AppCompatActivity {
             HashMap<String, List<String>> hash = MainActivity.stringToHash(cursor.getString(1));
 
             for(String key: hash.keySet()){ //going through every bus number
+                Log.d(key, ": "+hash.get(key));
                 String busTimes = formBusTimeString(hash, key);
                 list.add(new BusTimeGUI(stopID, busTimes, key));
             }
@@ -83,7 +84,7 @@ public class ViewAllStopsActivity extends AppCompatActivity {
                 }
             }
         }
-        return "Nothing here";
+        return "N/A";
     }
 
     //Input: String i.e. "11:45pm"

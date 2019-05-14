@@ -200,6 +200,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     //Right now it's hard coded to the 1616 bus stop ID. You can change it by changing the 15 that's
     //before wd to some other bus number like 16 or 20.
     protected void connectToMetro(View view){
+        dbHandler.clean();
         netInfo = connectMan.getActiveNetworkInfo();
         if(netInfo != null && netInfo.isConnected()){
             new OnlineMetroGetter().execute("https://www.scmtd.com/en/routes/schedule-by-stop/1616/2019-05-17#tripDiv");

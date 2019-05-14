@@ -75,7 +75,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void clean(){
         SQLiteDatabase db = getWritableDatabase();
         db.execSQL("delete from " + DB_NAME);
-        db.delete("SQLITE_SEQUENCE", "NAME = ?", new String[]{DB_NAME});
     }
 
     //Got from class
