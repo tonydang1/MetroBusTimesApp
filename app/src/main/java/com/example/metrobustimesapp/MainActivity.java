@@ -259,4 +259,58 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             jsonTxt.setText(result);
         }
     }
+    // Input: HTML from Element returned by Jsoup.parse(url).select("tbody")
+    // Output:
+    private String parseElement(String input){
+        String delims = "[ ]+";
+        String[] tokens = input.split(delims);
+        String output = "";
+        for(int i = 0; i < tokens.length; i++){
+            if(tokens[i].equals("Santa")) continue;
+            if(tokens[i].equals("Cruz")) continue;
+            if(tokens[i].equals("Metro")) continue;
+            if(tokens[i].equals("CenterTrip")) continue;
+            if(tokens[i].equals("stops")) continue;
+            if(tokens[i].equals("below")) continue;
+            if(tokens[i].equals("below:")) continue;
+            if(tokens[i].equals("Approximate")) continue;
+            if(tokens[i].equals("Trip")) continue;
+            if(tokens[i].equals("stop")) continue;
+            if(tokens[i].equals("Arrives")) continue;
+            if(tokens[i].equals("Delaware")) continue;
+            if(tokens[i].equals("&")) continue;
+            if(tokens[i].equals("Seymour")) continue;
+            if(tokens[i].equals("Mission")) continue;
+            if(tokens[i].equals("Trescony")) continue;
+            if(tokens[i].equals("LibertyTrip")) continue;
+            if(tokens[i].equals("TresconyTrip")) continue;
+            if(tokens[i].equals("MissionTrip")) continue;
+
+            if(tokens[i].equals("times")){
+                output += "\n";
+                continue;
+            }
+
+            output += tokens[i];
+
+            output += " ";
+            //if(tokens[i].equals("1616")) output += "\n";
+            if(tokens[i].endsWith("Trip")) output += "\n";
+
+        }
+        // Removes Trip from Destination Time
+        output = output.replace("Trip", "");
+        String[] busList = output.split(System.getProperty("line.separator"));
+
+        Log.d("Parse", output);
+
+        return output;
+    }
+
+    private void populateDB(String input){
+        // if length = 4, busID = list[0],                      schedTime = list[1], stopID = list[2], destTime = list[3]
+        // if length = 6, busID = list[0] + list[1] + list[2],  schedTime = list[3], stopID = list[4], destTime = list[5]
+        // if length = 7, busID = list[0] + list[1] + list[2], MWF bool = list[3]  schedTime = list[4], stopID = list[5], destTime = list[6]
+
+    }
 }
