@@ -39,12 +39,12 @@ public class ViewAllStopsActivity extends AppCompatActivity {
         Cursor cursor = MainActivity.dbHandler.getData(sql);
         list.clear();
         while(cursor.moveToNext()){
-            int id = cursor.getInt(0);
+            int stopID = cursor.getInt(0);
             HashMap<String, List<String>> hash = MainActivity.stringToHash(cursor.getString(1));
 
             for(String key: hash.keySet()){ //going through every bus number
                 String busTimes = formBusTimeString(hash, key);
-                list.add(new BusTimeGUI(id, busTimes, Integer.toString(id)));
+                list.add(new BusTimeGUI(stopID, busTimes, key));
             }
             adapter.notifyDataSetChanged();
         }
@@ -83,7 +83,7 @@ public class ViewAllStopsActivity extends AppCompatActivity {
                 }
             }
         }
-        return result;
+        return "Nothing here";
     }
 
     //Input: String i.e. "11:45pm"
