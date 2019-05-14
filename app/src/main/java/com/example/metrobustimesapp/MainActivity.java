@@ -384,6 +384,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             }
         }//for
 
+        jsonTxt.setText(Bus_10.toString());
+
         Log.d("Bus 10", Bus_10.toString());
         Log.d("Bus 16", Bus_16.toString());
         Log.d("Bus 20", Bus_20.toString());
