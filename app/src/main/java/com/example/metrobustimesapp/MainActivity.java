@@ -24,6 +24,7 @@ import android.net.ConnectivityManager;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -204,25 +205,23 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 //connecting
                 URL url = new URL(params[0]);
                 urlText = url.toString();
-                Document doc = Jsoup.connect(urlText).get();
-                metroString = doc.text();
-//                connection = (HttpURLConnection) url.openConnection();
-//                connection.connect();
+                connection = (HttpURLConnection) url.openConnection();
+                connection.connect();
+
 
                 //parsing info setup
-//                InputStream stream = connection.getInputStream();
-//                reader = new BufferedReader(new InputStreamReader(stream));
-//                StringBuffer buffer = new StringBuffer();
-//                String line = "";
+                InputStream stream = connection.getInputStream();
+                reader = new BufferedReader(new InputStreamReader(stream));
+                StringBuffer buffer = new StringBuffer();
+                String line = "";
 
                 //reading line
-//                while ((line = reader.readLine()) != null) {
-//                    buffer.append(line+"\n");
-                    Log.d("Response: ", "> " + metroString);   //here u ll get whole response...... :-)
-                    return metroString;
-//                }
-//
-//                return buffer.toString();
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line+"\n");
+                }
+                Document doc = Jsoup.parse(buffer.toString());
+                Elements element = doc.select("tbody");
+                return buffer.toString();
 
 
             } catch (MalformedURLException e) {
