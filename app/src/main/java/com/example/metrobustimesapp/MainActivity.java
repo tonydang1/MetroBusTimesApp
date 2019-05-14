@@ -1,5 +1,6 @@
 package com.example.metrobustimesapp;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -54,7 +55,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     String htmlText;
     DatabaseHandler dbHandler;
     String dbName;
+    String busIDString;
+    int busID;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +66,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         setContentView(R.layout.activity_main);
         dbName = getString(R.string.DBName);
 
+        busID = 1616;
+        busIDString = Integer.toString(busID);
         dbHandler = new DatabaseHandler(this, dbName, null,1);
         dbHandler.queryData("CREATE TABLE IF NOT EXISTS "+dbName+"(ID INTEGER, HASHTABLE TEXT)");
 
@@ -70,12 +76,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         double hagar_bus_lat = 36.996801;
         double hagar_bus_long = -122.055408;
 
-        double lat1 = mch_lat;
-        double lon1 = mch_long;
-        double lat2 = hagar_bus_lat;
-        double lon2 = hagar_bus_long;
-
-        double d = Math.acos(Math.sin(lat1)*Math.sin(lat2)+Math.cos(lat1)*Math.cos(lat2)*Math.cos(lon1-lon2));
+        double d = Math.acos(Math.sin(mch_lat)*Math.sin(hagar_bus_lat)+Math.cos(mch_lat)*Math.cos(hagar_bus_lat)*Math.cos(mch_long - hagar_bus_long));
 
         double distance_km = 6371 * d;
 
@@ -127,6 +128,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     }
 
     //When user moves do something
+    @SuppressLint("SetTextI18n")
     @Override
     public void onLocationChanged(Location location) {
 
@@ -183,7 +185,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     protected String hashToString(HashMap<String, List<String>> hash){
         Gson gson = new Gson();
         String inputString= gson.toJson(hash);
-        jsonTxt.setText(inputString);
         return inputString;
     }
 
@@ -196,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     protected void connectToMetro(View view){
         netInfo = connectMan.getActiveNetworkInfo();
         if(netInfo != null && netInfo.isConnected()){
-            new OnlineMetroGetter().execute("https://www.scmtd.com/en/routes/schedule-by-stop/1616#tripDiv");
+            new OnlineMetroGetter().execute("https://www.scmtd.com/en/routes/schedule-by-stop/"+busIDString+"#tripDiv");
         } else {
             Toast.makeText(MainActivity.this, "NO INTERNET CONNECTION", Toast.LENGTH_LONG).show();
         }
@@ -272,10 +273,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             if (pd.isShowing()){
                 pd.dismiss();
             }
+            dbHandler.insertData(busID, result);
             htmlText = result;
             jsonTxt.setText(result);
         }
     }
+
     // Input: HTML from Element returned by Jsoup.parse(url).select("tbody")
     // Output: Bus times separated by \n
     private String parseElement(String input){
@@ -320,14 +323,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         //Log.d("Parse", output);
 
-        populateDB(output);
+        String tempString = populateDB(output);
 
-        return output;
+        return tempString;
     }
 
     //Input: Bus times separated by \n
     //Output: Array of destination times for each bus
-    private void populateDB(String input){
+    private String populateDB(String input){
         String[] list = input.split(System.getProperty("line.separator"));
 
         // if length = 4, busID = list[0],                      schedTime = list[1], stopID = list[2], destTime = list[3]
@@ -380,7 +383,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                     Bus_19.add(destTime);
                     break;
                 default:
-                    continue;
             }
         }//for
 
@@ -392,10 +394,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         busses.put("15", Bus_15);
         busses.put("19", Bus_19);
 
-        jsonTxt.setText(hashToString(busses));
+        String s = hashToString(busses);
         Log.d("Bus 10", Bus_10.toString());
         Log.d("Bus 16", Bus_16.toString());
         Log.d("Bus 20", Bus_20.toString());
         Log.d("Bus 20D", Bus_20D.toString());
+        return s;
     }
 }
