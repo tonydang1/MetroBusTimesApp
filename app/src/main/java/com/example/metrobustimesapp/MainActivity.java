@@ -24,6 +24,7 @@ import android.net.NetworkInfo;
 import android.net.ConnectivityManager;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -33,6 +34,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -186,6 +188,17 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         Gson gson = new Gson();
         String inputString= gson.toJson(hash);
         return inputString;
+    }
+
+    //Author: Anthony
+    //Input: Jsonified hashtable
+    //Output: Decoded hashtable
+    //Decodes the json and turns it back into a hashtable
+    protected HashMap<String, List<String>> stringToHash(String stringHash){
+        Gson gson = new Gson();
+        Type type = new TypeToken<ArrayList<String>>() {}.getType();
+        HashMap<String, List<String>> hash = gson.fromJson(stringHash, type);
+        return hash;
     }
 
     //Author: Anthony
