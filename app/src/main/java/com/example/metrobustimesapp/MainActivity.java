@@ -184,7 +184,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     //Object for connecting to metro website and grabbing json/xml file(hopefully).
     private class OnlineMetroGetter extends AsyncTask<String, String, String> {
         private ProgressDialog pd;
-        private String metroString;
 
         protected void onPreExecute() {
             super.onPreExecute();
@@ -199,12 +198,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
             HttpURLConnection connection = null;
             BufferedReader reader = null;
-            String urlText;
+            String stopRow;
 
             try {
                 //connecting
                 URL url = new URL(params[0]);
-                urlText = url.toString();
                 connection = (HttpURLConnection) url.openConnection();
                 connection.connect();
 
@@ -221,7 +219,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 }
                 Document doc = Jsoup.parse(buffer.toString());
                 Elements element = doc.select("tbody");
-                return buffer.toString();
+                stopRow = element.text();
+                return stopRow;
 
 
             } catch (MalformedURLException e) {
