@@ -26,12 +26,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         Toast.makeText(ctx, "TABLE IS CREATED", Toast.LENGTH_LONG).show();
     }
 
-    //From youtube
+    //Input: SQL code
+    //Output: Output should be logged into run
     public void queryData(String sql){
         SQLiteDatabase database = getWritableDatabase();
         database.execSQL(sql);
     }
 
+    //Input: Bus stop ID, JSON string with hashtable
+    //Output: adds it to the database
     public void insertData(int busID, String hashtable){
         SQLiteDatabase database = getWritableDatabase();
         String sql = "INSERT INTO " + DB_NAME + " VALUES (" + busID + ", ?)";
@@ -43,6 +46,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         statement.executeInsert();
     }
 
+    //Input: SQL code
+    //Output: Returns the result of your query as a cursor
     public Cursor getData(String sql){
         SQLiteDatabase database = getReadableDatabase();
         Cursor cursor = database.rawQuery(sql, null);
@@ -50,6 +55,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     }
 
+    //Input: ID of bus stop
+    //Output: Deletes the data of that bus stop
     public int delete(String ID) {
         try {
             SQLiteDatabase db = getReadableDatabase();
@@ -61,6 +68,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
+    //Input: None
+    //Output: Clean database
+    //Discards everything the database holds so its fresh
     public void clean(){
         SQLiteDatabase db = getWritableDatabase();
         db.execSQL("delete from " + DB_NAME);
