@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:layout_marginLeft="75dp"
+        android:background="@color/blue"
+        android:textSize="25dp"
+        android:gravity="center_vertical"
+        android:textColor="@color/gold"
+        android:text="Next bus in:"/>
+
+    <TextView
+        android:id="@+id/busNumber"
+        android:layout_width="75dp"
+        android:layout_height="105dp"
+        android:background="@color/blue"
+        android:textColor="@color/gold"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:textSize="45dp"
+        android:text="16" />
+
+    <EditText
+        android:id="@+id/nextBusTime"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_marginTop="35dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginLeft="0dp"
+        android:layout_toEndOf="@+id/busNumber"
+        android:layout_toRightOf="@+id/busNumber"
+        android:background="@color/gold"
+        android:textColor="@color/blue"
+        android:textAlignment="center"
+        android:textStyle="bold"
+        android:textSize="35dp"
+        android:text="15, 30 minutes" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:layout_below="@+id/busNumber"/>
+
+</RelativeLayout>

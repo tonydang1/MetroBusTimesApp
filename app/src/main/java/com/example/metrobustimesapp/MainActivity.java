@@ -46,16 +46,16 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
 
+    NetworkInfo netInfo;
+    LocationManager locationManager;
+    static DatabaseHandler dbHandler;
+    ConnectivityManager connectMan;
     Button getLocationBtn;
     TextView locationText;
-    LocationManager locationManager;
-    NetworkInfo netInfo;
-    ConnectivityManager connectMan;
     TextView jsonTxt;
     TextView textView;
     TextView editStop;
     String htmlText;
-    DatabaseHandler dbHandler;
     String dbName;
     String busIDString;
     int busID;
@@ -96,8 +96,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         String string_d = Double.toString(distance_km);
         textView.setText("Distance in km: "+ string_d);
 
-        display_stops();
-
         //get permission if not available
         if (ContextCompat.checkSelfPermission(getApplicationContext(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
@@ -113,11 +111,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         });
     }
 
-    //Display bus stops
-    void display_stops(){
-
-    }
-
     //Get location of user
     void getLocation() {
         try {
@@ -129,7 +122,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
-    //When user moves do something
     @SuppressLint("SetTextI18n")
     @Override
     public void onLocationChanged(Location location) {
@@ -194,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     //Input: Jsonified hashtable
     //Output: Decoded hashtable
     //Decodes the json and turns it back into a hashtable
-    protected HashMap<String, List<String>> stringToHash(String stringHash){
+    protected static HashMap<String, List<String>> stringToHash(String stringHash){
         Gson gson = new Gson();
         Type type = new TypeToken<ArrayList<String>>() {}.getType();
         HashMap<String, List<String>> hash = gson.fromJson(stringHash, type);
