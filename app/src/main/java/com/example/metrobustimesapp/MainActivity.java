@@ -173,6 +173,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         startActivity(intent);
     }
 
+    public void getAllStops(){
+        Intent intent = new Intent(this, ViewAllStopsActivity.class);
+        startActivity(intent);
+    }
+
     //Author: Anthony
     //Input: Hashtable
     //Output: Returns a string version of the hashtable
@@ -285,6 +290,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             dbHandler.insertData(busID, result);
             htmlText = result;
             jsonTxt.setText(result);
+            getAllStops();
         }
     }
 
