@@ -35,9 +35,11 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
 
@@ -275,7 +277,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
     // Input: HTML from Element returned by Jsoup.parse(url).select("tbody")
-    // Output:
+    // Output: Bus times separated by \n
     private String parseElement(String input){
         String delims = "[ ]+";
         String[] tokens = input.split(delims);
@@ -310,22 +312,82 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
             output += " ";
             //if(tokens[i].equals("1616")) output += "\n";
-            if(tokens[i].endsWith("Trip")) output += "\n";
+            //if(tokens[i].endsWith("Trip")) output += "\n";
 
         }
         // Removes Trip from Destination Time
         output = output.replace("Trip", "");
-        String[] busList = output.split(System.getProperty("line.separator"));
 
-        Log.d("Parse", output);
+        //Log.d("Parse", output);
+
+        populateDB(output);
 
         return output;
     }
 
+    //Input: Bus times separated by \n
+    //Output: Array of destination times for each bus
     private void populateDB(String input){
+        String[] list = input.split(System.getProperty("line.separator"));
+
         // if length = 4, busID = list[0],                      schedTime = list[1], stopID = list[2], destTime = list[3]
         // if length = 6, busID = list[0] + list[1] + list[2],  schedTime = list[3], stopID = list[4], destTime = list[5]
         // if length = 7, busID = list[0] + list[1] + list[2], MWF bool = list[3]  schedTime = list[4], stopID = list[5], destTime = list[6]
 
+        Map<String, List<String>> busses = new HashMap<>();
+
+        List<String> Bus_16 = new ArrayList<>();
+        List<String> Bus_10 = new ArrayList<>();
+        List<String> Bus_20 = new ArrayList<>();
+        List<String> Bus_20D = new ArrayList<>();
+        List<String> Bus_22 = new ArrayList<>();
+
+        List<String> Bus_15 = new ArrayList<>();
+        List<String> Bus_19 = new ArrayList<>();
+
+        String destTime = "";
+
+        String[] list_to_array;
+        for(int i = 0; i < list.length; i++){
+            list_to_array = list[i].split(" ");
+            if(list_to_array.length == 4){
+                destTime = list_to_array[3];
+            }else if(list_to_array.length == 6){
+                destTime = list_to_array[5];
+            }else if(list_to_array.length == 7){
+                destTime = list_to_array[6];
+            }
+            switch(list_to_array[0]){
+                case "16":
+                    Bus_16.add(destTime);
+                    break;
+                case "10":
+                    Bus_10.add(destTime);
+                    break;
+                case "20":
+                    Bus_20.add(destTime);
+                    break;
+                case "20D":
+                    Bus_20D.add(destTime);
+                    break;
+                case "22":
+                    Bus_22.add(destTime);
+                    break;
+                case "15":
+                    Bus_15.add(destTime);
+                    break;
+                case "19":
+                    Bus_19.add(destTime);
+                    break;
+                default:
+                    continue;
+            }
+        }//for
+
+        Log.d("Bus 10", Bus_10.toString());
+        Log.d("Bus 16", Bus_16.toString());
+        Log.d("Bus 20", Bus_20.toString());
+        Log.d("Bus 20D", Bus_20D.toString());
     }
+
 }
