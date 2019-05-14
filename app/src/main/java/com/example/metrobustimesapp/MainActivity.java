@@ -334,7 +334,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         // if length = 6, busID = list[0] + list[1] + list[2],  schedTime = list[3], stopID = list[4], destTime = list[5]
         // if length = 7, busID = list[0] + list[1] + list[2], MWF bool = list[3]  schedTime = list[4], stopID = list[5], destTime = list[6]
 
-        Map<String, List<String>> busses = new HashMap<>();
+        HashMap<String, List<String>> busses = new HashMap<>();
 
         List<String> Bus_16 = new ArrayList<>();
         List<String> Bus_10 = new ArrayList<>();
@@ -384,8 +384,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             }
         }//for
 
-        jsonTxt.setText(Bus_10.toString());
+        busses.put("16", Bus_16);
+        busses.put("10", Bus_10);
+        busses.put("20", Bus_20);
+        busses.put("20D", Bus_20D);
+        busses.put("22", Bus_22);
+        busses.put("15", Bus_15);
+        busses.put("19", Bus_19);
 
+        jsonTxt.setText(hashToString(busses));
         Log.d("Bus 10", Bus_10.toString());
         Log.d("Bus 16", Bus_16.toString());
         Log.d("Bus 20", Bus_20.toString());
