@@ -61,6 +61,7 @@ public class BusTimeListAdapter extends BaseAdapter {
         holder.busView.setText(gui.getBusNumber());
         holder.timeView.setText(gui.getNextBus());
 
-        return convertView;
+        //hey, I changed this to return row instead of convertView...should work now. --Nicolle
+        return row;
     }
 }
