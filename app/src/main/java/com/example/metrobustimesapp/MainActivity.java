@@ -269,7 +269,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                     e.printStackTrace();
                 }
             }
-            return null;
+            return "";
         }
 
         @Override

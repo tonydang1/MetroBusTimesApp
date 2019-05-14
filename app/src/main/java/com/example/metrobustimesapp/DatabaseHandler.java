@@ -37,7 +37,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     //Output: adds it to the database
     public void insertData(int busID, String hashtable){
         SQLiteDatabase database = getWritableDatabase();
-        String sql = "INSERT INTO " + DB_NAME + " VALUES (" + busID + ", " + hashtable + ")";
+        String sql = "INSERT INTO " + DB_NAME + " VALUES (" + busID + ", ?)";
+        SQLiteStatement statement = database.compileStatement(sql);
+
+        statement.clearBindings();
+
+        statement.bindString(1, hashtable);
+
+        statement.executeInsert();
     }
 
     //Input: SQL code

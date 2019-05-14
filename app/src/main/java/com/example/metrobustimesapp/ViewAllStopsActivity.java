@@ -3,6 +3,7 @@ package com.example.metrobustimesapp;
 import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.GridView;
 
@@ -38,7 +39,6 @@ public class ViewAllStopsActivity extends AppCompatActivity {
         Cursor cursor = MainActivity.dbHandler.getData(sql);
         list.clear();
         while(cursor.moveToNext()){
-
             int id = cursor.getInt(0);
             HashMap<String, List<String>> hash = MainActivity.stringToHash(cursor.getString(1));
 
@@ -95,7 +95,7 @@ public class ViewAllStopsActivity extends AppCompatActivity {
         int hour, min;
 
         String amPM = timeString.substring(timeString.length()-2);
-        time = timeString.replaceAll("[^\\d]",""); //gets rid of AM/PM
+        time = timeString.replaceAll("[a-zA-Z]",""); //gets rid of AM/PM
 
         //splitting into hour and min
         timeArr = time.split(":");

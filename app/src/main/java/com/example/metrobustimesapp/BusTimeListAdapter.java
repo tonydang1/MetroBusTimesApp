@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -62,6 +61,6 @@ public class BusTimeListAdapter extends BaseAdapter {
         holder.busView.setText(gui.getBusNumber());
         holder.timeView.setText(gui.getNextBus());
 
-        return null;
+        return convertView;
     }
 }
