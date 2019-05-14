@@ -22,6 +22,8 @@ import android.widget.Toast;
 import android.net.NetworkInfo;
 import android.net.ConnectivityManager;
 
+import com.google.gson.Gson;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -33,6 +35,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -170,6 +173,17 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public void getAllStops(View view) {
         Intent intent = new Intent(this, ViewAllStopsActivity.class);
         startActivity(intent);
+    }
+
+    //Author: Anthony
+    //Input: Hashtable
+    //Output: Returns a string version of the hashtable
+    protected String hashToString(HashMap<String, List<String>>){
+        Gson gson = new Gson();
+
+        String inputString= gson.toJson(inputArray);
+
+        System.out.println("inputString= " + inputString);
     }
 
     //Author: Anthony
