@@ -47,12 +47,18 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     TextView textView;
     TextView editStop;
     String htmlText;
+    DatabaseHandler dbHandler;
+    String dbName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
         setContentView(R.layout.activity_main);
+        dbName = getString(R.string.DBName);
+
+        dbHandler = new DatabaseHandler(this, dbName+".sqlite", null,1);
+        dbHandler.queryData("CREATE TABLE IF NOT EXISTS "+dbName+"(ID INTEGER, HASHTABLE TEXT)");
 
         double mch_lat = 36.996165;
         double mch_long =  -122.058873;
@@ -157,6 +163,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     // hagar_bus    36.996801, -122.055408
     // hagar_bus2   36.997611, -122.055053
 
+
+    //Author: Anthony
+    //Input: Called from pressing getAllStopsButton in activity_main
+    //Output: Sends you to ShowAllStops (will change to search bar)
+    public void getAllStops(View view) {
+        Intent intent = new Intent(this, ViewAllStopsActivity.class);
+        startActivity(intent);
+    }
+
     //Author: Anthony
     //Input: Called from getJsonButton
     //Output: Should transfer some kind of information to some database (WIP)
@@ -170,14 +185,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         } else {
             Toast.makeText(MainActivity.this, "NO INTERNET CONNECTION", Toast.LENGTH_LONG).show();
         }
-    }
-
-    //Author: Anthony
-    //Input: Called from pressing getAllStopsButton in activity_main
-    //Output: Sends you to ShowAllStops (will change to search bar)
-    public void getAllStops(View view) {
-        Intent intent = new Intent(this, ViewAllStopsActivity.class);
-        startActivity(intent);
     }
 
     //Author: Anthony

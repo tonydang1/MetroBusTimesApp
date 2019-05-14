@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">MetroBusTimesApp</string>
     <string name="defaultText">Default</string>
+    <string name="DBName">BusStopDB</string>
 </resources>
