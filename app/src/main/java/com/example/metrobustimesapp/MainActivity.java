@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         setContentView(R.layout.activity_main);
         dbName = getString(R.string.DBName);
 
-        dbHandler = new DatabaseHandler(this, dbName+".sqlite", null,1);
+        dbHandler = new DatabaseHandler(this, dbName, null,1);
         dbHandler.queryData("CREATE TABLE IF NOT EXISTS "+dbName+"(ID INTEGER, HASHTABLE TEXT)");
 
         double mch_lat = 36.996165;
