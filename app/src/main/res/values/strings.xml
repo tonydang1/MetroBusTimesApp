@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MetroBusTimesApp</string>
+    <string name="defaultText">Default</string>
 </resources>
