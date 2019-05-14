@@ -22,6 +22,9 @@ import android.widget.Toast;
 import android.net.NetworkInfo;
 import android.net.ConnectivityManager;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     TextView jsonTxt;
     TextView textView;
     TextView editStop;
+    String htmlText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -179,6 +183,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     //Object for connecting to metro website and grabbing json/xml file(hopefully).
     private class OnlineMetroGetter extends AsyncTask<String, String, String> {
         private ProgressDialog pd;
+        private String metroString;
 
         protected void onPreExecute() {
             super.onPreExecute();
@@ -187,32 +192,37 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             pd.setCancelable(false);
             pd.show();
         }
+
         @Override
         protected String doInBackground(String... params) {
 
-
             HttpURLConnection connection = null;
             BufferedReader reader = null;
+            String urlText;
 
             try {
                 //connecting
                 URL url = new URL(params[0]);
-                connection = (HttpURLConnection) url.openConnection();
-                connection.connect();
+                urlText = url.toString();
+                Document doc = Jsoup.connect(urlText).get();
+                metroString = doc.text();
+//                connection = (HttpURLConnection) url.openConnection();
+//                connection.connect();
 
                 //parsing info setup
-                InputStream stream = connection.getInputStream();
-                reader = new BufferedReader(new InputStreamReader(stream));
-                StringBuffer buffer = new StringBuffer();
-                String line = "";
+//                InputStream stream = connection.getInputStream();
+//                reader = new BufferedReader(new InputStreamReader(stream));
+//                StringBuffer buffer = new StringBuffer();
+//                String line = "";
 
                 //reading line
-                while ((line = reader.readLine()) != null) {
-                    buffer.append(line+"\n");
-                    Log.d("Response: ", "> " + line);   //here u ll get whole response...... :-)
-                }
-
-                return buffer.toString();
+//                while ((line = reader.readLine()) != null) {
+//                    buffer.append(line+"\n");
+                    Log.d("Response: ", "> " + metroString);   //here u ll get whole response...... :-)
+                    return metroString;
+//                }
+//
+//                return buffer.toString();
 
 
             } catch (MalformedURLException e) {
@@ -240,6 +250,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             if (pd.isShowing()){
                 pd.dismiss();
             }
+            htmlText = result;
             jsonTxt.setText(result);
         }
     }
