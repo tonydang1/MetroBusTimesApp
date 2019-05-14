@@ -178,12 +178,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     //Author: Anthony
     //Input: Hashtable
     //Output: Returns a string version of the hashtable
-    protected String hashToString(HashMap<String, List<String>>){
+    protected String hashToString(HashMap<String, List<String>> hash){
         Gson gson = new Gson();
-
-        String inputString= gson.toJson(inputArray);
-
-        System.out.println("inputString= " + inputString);
+        String inputString= gson.toJson(hash);
+        jsonTxt.setText(inputString);
+        return inputString;
     }
 
     //Author: Anthony
