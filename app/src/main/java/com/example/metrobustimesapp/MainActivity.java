@@ -1,5 +1,6 @@
 package com.example.metrobustimesapp;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -44,7 +45,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements LocationListener {
+public class MainActivity extends AppCompatActivity {
 
     NetworkInfo netInfo;
     LocationManager locationManager;
@@ -83,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         double distance_km = 6371 * d;
 
         //Widget setup
-        getLocationBtn = findViewById(R.id.getLocationBtn);
+        //getLocationBtn = findViewById(R.id.getLocationBtn);
         locationText = findViewById(R.id.locationText);
         editStop = findViewById(R.id.enterBusStop);
         textView = findViewById(R.id.textView);
@@ -96,65 +97,23 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         String string_d = Double.toString(distance_km);
         textView.setText("Distance in km: "+ string_d);
 
-        //get permission if not available
-        if (ContextCompat.checkSelfPermission(getApplicationContext(),
-                android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(getApplicationContext(),
-                android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION}, 101);
-        }
+        getLocationBtn = findViewById(R.id.button);
+        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},123);
         getLocationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getLocation();
+                GPSHandler g = new GPSHandler(getApplicationContext());
+                Location l = g.getLocation();
+                if(l != null){
+                    double lat = l.getLatitude();
+                    double lon = l.getLongitude();
+                    Toast.makeText(getApplicationContext(), "LAT: "+ lat+ "\n LON: "+ lon, Toast.LENGTH_LONG).show();
+                }
             }
         });
-    }
-
-    //Get location of user
-    void getLocation() {
-        try {
-            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 5, this);
-        }
-        catch(SecurityException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @SuppressLint("SetTextI18n")
-    @Override
-    public void onLocationChanged(Location location) {
-
-        locationText.setText("Latitude: " + location.getLatitude() + "\n Longitude: " + location.getLongitude());
-        //locationText.setText("Latitude: " + mch_lat + "\n Longitude: " + mch_long);
-
-        try {
-            Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-            locationText.setText(locationText.getText() + "\n"+addresses.get(0).getAddressLine(0)+", "+
-                    addresses.get(0).getAddressLine(1)+", "+addresses.get(0).getAddressLine(2));
-        }catch(Exception e) {
-
-        }
 
     }
 
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-        Toast.makeText(MainActivity.this, "Please Enable GPS and Internet", Toast.LENGTH_SHORT).show();
-    }
 
     // location lat lng
     // sne          36.999212, -122.060613
