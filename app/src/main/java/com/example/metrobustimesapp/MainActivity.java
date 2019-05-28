@@ -272,7 +272,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
-            } finally {
+            } catch(Exception e) {
+                e.printStackTrace();
+            } finally{
                 if (connection != null) {
                     connection.disconnect();
                 }
@@ -293,10 +295,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             if (pd.isShowing()){
                 pd.dismiss();
             }
-            dbHandler.insertData(busID, result);
-            htmlText = result;
-            jsonTxt.setText(result);
-            getAllStops();
+            Log.d("debugging", result);
+            try {
+                dbHandler.insertData(busID, result);
+                htmlText = result;
+                jsonTxt.setText(result);
+                getAllStops();
+            } catch (Exception e){
+                Toast.makeText(MainActivity.this, "Invalid Stop ID", Toast.LENGTH_LONG).show();
+            }
         }
     }
 
