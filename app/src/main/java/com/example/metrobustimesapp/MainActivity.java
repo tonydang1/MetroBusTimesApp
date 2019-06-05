@@ -1,24 +1,20 @@
 package com.example.metrobustimesapp;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.net.NetworkInfo;
@@ -42,14 +38,15 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
     NetworkInfo netInfo;
     LocationManager locationManager;
     static DatabaseHandler dbHandler;
+    Spinner stopSpinner;
+    SpinnerActivity spinnerListener;
+    ArrayAdapter<CharSequence> adapter;
     ConnectivityManager connectMan;
     Button getLocationBtn;
     TextView locationText;
@@ -59,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
     String htmlText;
     String dbName;
     String busIDString;
+    static String selectedBusStop; //bus stop selected from down down
     int busID;
 
     @SuppressLint("SetTextI18n")
@@ -81,6 +79,15 @@ public class MainActivity extends AppCompatActivity {
         editStop = findViewById(R.id.enterBusStop);
         textView = findViewById(R.id.textView);
         jsonTxt = findViewById(R.id.jsonText);
+        stopSpinner = findViewById(R.id.nearbyStopsDropDown);
+
+        //adapter for spinner setup
+        adapter = ArrayAdapter.createFromResource(this,
+                R.array.testList, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        stopSpinner.setAdapter(adapter);
+        spinnerListener = new SpinnerActivity();
+        stopSpinner.setOnItemSelectedListener(spinnerListener);
 
         //Internet stuff
         connectMan = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
@@ -100,8 +107,8 @@ public class MainActivity extends AppCompatActivity {
         double fresca_lat = 37.001028;
         double fresca_lng = -122.057713;
         find_closest_bus(fresca_lat, fresca_lng);
-
     }
+
     private void find_closest_bus(double current_lat, double current_lng){
         BufferedReader reader;
         String[] line_split;
