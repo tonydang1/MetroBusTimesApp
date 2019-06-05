@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     static String selectedBusStop; //bus stop selected from down down
     int busID;
 
+    private String[] close_busses_names;
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
         double min_d = 2000;
         for(Bus t : busList){
             double d = meterDistanceBetweenPoints(current_lat, current_lng, Double.parseDouble(t.lat), Double.parseDouble(t.lon));
-            if(d <= 600){
+            if(d <= 700){
                 closeBusses.add(t);
                 if(d < min_d){
                     min_d = d;
@@ -151,9 +152,14 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        // spinnerList will contain an array of bus names from closeBusses
+        String[] spinnerList = new String[closeBusses.size()];
+        int i = 0;
         for(Bus t : closeBusses){
             Log.d("close bus", t.ID + " " + t.name);
+            spinnerList[i] = t.name; i++;
         }
+        close_busses_names = spinnerList;
 
         if(closest_bus != null){
             Log.d("closest bus--", closest_bus.ID + " " + closest_bus.name);
