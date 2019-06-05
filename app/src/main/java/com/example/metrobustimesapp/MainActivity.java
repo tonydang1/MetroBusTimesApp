@@ -74,14 +74,6 @@ public class MainActivity extends AppCompatActivity {
         dbHandler = new DatabaseHandler(this, dbName, null,1);
         dbHandler.queryData("CREATE TABLE IF NOT EXISTS "+dbName+"(ID INTEGER, HASHTABLE TEXT)");
 
-        double mch_lat = 36.996165;
-        double mch_long =  -122.058873;
-        double hagar_bus_lat = 36.996801;
-        double hagar_bus_long = -122.055408;
-
-        double d = Math.acos(Math.sin(mch_lat)*Math.sin(hagar_bus_lat)+Math.cos(mch_lat)*Math.cos(hagar_bus_lat)*Math.cos(mch_long - hagar_bus_long));
-
-        double distance_km = 6371 * d;
 
         //Widget setup
         //getLocationBtn = findViewById(R.id.getLocationBtn);
@@ -94,24 +86,15 @@ public class MainActivity extends AppCompatActivity {
         connectMan = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         netInfo = connectMan.getActiveNetworkInfo();
 
-        String string_d = Double.toString(distance_km);
-        textView.setText("Distance in km: "+ string_d);
 
-        getLocationBtn = findViewById(R.id.button);
-        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},123);
-        getLocationBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                GPSHandler g = new GPSHandler(getApplicationContext());
-                Location l = g.getLocation();
-                if(l != null){
-                    double lat = l.getLatitude();
-                    double lon = l.getLongitude();
-                    Toast.makeText(getApplicationContext(), "LAT: "+ lat+ "\n LON: "+ lon, Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-
+        //GPS stuff
+        GPSHandler g = new GPSHandler(getApplicationContext());
+        Location l = g.getLocation();
+        if(l != null){
+            double lat = l.getLatitude();
+            double lon = l.getLongitude();
+            find_closest_bus(lat, lon);
+        }
 
         // testing find_closest_bus
         double fresca_lat = 37.001028;
