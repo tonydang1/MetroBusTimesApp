@@ -164,19 +164,19 @@ public class MainActivity extends AppCompatActivity {
     //Right now it's hard coded to the 1616 bus stop ID. You can change it by changing the 15 that's
     //before wd to some other bus number like 16 or 20.
     protected void connectToMetro(View view){
-        dbHandler.clean();
         netInfo = connectMan.getActiveNetworkInfo();
 
         String temp_busid = editStop.getText().toString();
         // TODO: check if busid is empty / valid
-
+        // TODO: store all bus activity.
         if(temp_busid.matches("")){
             Toast.makeText(MainActivity.this, "MUST ENTER BUSID", Toast.LENGTH_LONG).show();
             return;
         }
-
-        if(netInfo != null && netInfo.isConnected()){
-            new OnlineMetroGetter().execute("https://www.scmtd.com/en/routes/schedule-by-stop/"+temp_busid+"/2019-05-17#tripDiv");
+        if (netInfo != null && netInfo.isConnected()) {
+            //temp_busid = Integer.toString(i);
+            temp_busid = String.format("%04d", 1616);
+            new OnlineMetroGetter().execute("https://www.scmtd.com/en/routes/schedule-by-stop/" + temp_busid + "/2019-05-17#tripDiv");
         } else {
             Toast.makeText(MainActivity.this, "NO INTERNET CONNECTION", Toast.LENGTH_LONG).show();
         }

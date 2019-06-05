@@ -39,11 +39,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase database = getWritableDatabase();
         String sql = "INSERT INTO " + DB_NAME + " VALUES (" + busID + ", ?)";
         SQLiteStatement statement = database.compileStatement(sql);
-
         statement.clearBindings();
-
         statement.bindString(1, hashtable);
-
         statement.executeInsert();
     }
 

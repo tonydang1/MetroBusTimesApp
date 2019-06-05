@@ -2,4 +2,11 @@
     <string name="app_name">MetroBusTimesApp</string>
     <string name="defaultText">Default</string>
     <string name="DBName">BusStopDB</string>
+    <string name="spinnerPrompt">Nearby Stops</string>
+
+    <string-array name="testList">
+        <item>Jon Snow</item>
+        <item>Tyrion Lannister</item>
+        <item>Ned Stark</item>
+    </string-array>
 </resources>

@@ -21,21 +21,27 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        >
+        android:orientation="vertical">
+
+        <Spinner
+            android:id="@+id/nearbyStopsDropDown"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:entries="@array/testList"
+            android:prompt="@string/spinnerPrompt" />
 
         <EditText
             android:id="@+id/enterBusStop"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="50dp"
-            android:layout_marginRight="50dp"
             android:layout_marginTop="200dp"
+            android:layout_marginRight="50dp"
             android:ems="10"
-            android:textSize="20dp"
-            android:textColor="#000000"
             android:hint="Enter Bus Stop"
-            android:inputType="textPersonName" />
+            android:inputType="textPersonName"
+            android:textColor="#000000"
+            android:textSize="20dp" />
 
         <TextView
             android:id="@+id/textView"
@@ -43,11 +49,11 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="50dp"
-            android:textColor="#000000"
-            android:textAlignment="center"
             android:text="TextView"
+            android:textAlignment="center"
+            android:textColor="#000000"
             android:textSize="20sp"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/getLocationBtn"
@@ -61,7 +67,7 @@
             android:textColor="#0D47A1"
             android:textSize="20dp"
             android:textStyle="bold"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/locationText"
@@ -69,37 +75,46 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="100dp"
             android:text="Default"
-            android:textColor="#000000"
             android:textAlignment="center"
+            android:textColor="#000000"
             android:textSize="17sp"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/getAllStopButton"
             android:layout_width="200dp"
             android:layout_height="50dp"
-            android:layout_marginTop="210dp"
             android:layout_centerHorizontal="true"
+            android:layout_marginTop="210dp"
             android:background="#ffb130"
+            android:onClick="getAllStops"
+            android:text="Get all stops"
             android:textColor="#0D47A1"
             android:textSize="20dp"
             android:textStyle="bold"
-            android:onClick="getAllStops"
-            android:text="Get all stops"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/getJsonButton"
             android:layout_width="200dp"
             android:layout_height="50dp"
-            android:layout_marginTop="260dp"
             android:layout_centerHorizontal="true"
+            android:layout_marginTop="260dp"
             android:background="#ffb130"
+            android:onClick="connectToMetro"
+            android:text="search"
             android:textColor="#0D47A1"
             android:textSize="20dp"
-            android:textStyle="bold"
-            android:onClick="connectToMetro"
-            android:text="search" />
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="320dp"
+            android:text="clear location"
+            android:textStyle="bold" />
 
         <ScrollView
             android:layout_width="375dp"
@@ -121,14 +136,6 @@
                 android:textSize="15dp" />
 
         </ScrollView>
-
-        <Button
-            android:id="@+id/button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Button" />
-
-
     </RelativeLayout>
 
 </android.widget.LinearLayout>
