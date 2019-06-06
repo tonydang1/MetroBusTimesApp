@@ -56,7 +56,7 @@
             android:layout_height="51dp"
             android:layout_alignParentLeft="true"
             android:layout_alignParentBottom="true"
-            android:background="@color/white"
+            android:background="@drawable/rounded_button"
             android:onClick="refresh"
             android:src="@drawable/refresh" />
 
