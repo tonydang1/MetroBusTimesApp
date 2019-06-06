@@ -17,7 +17,6 @@
         android:scaleType="fitXY"
         app:srcCompat="@drawable/mbt" />
 
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -25,80 +24,19 @@
 
         <Spinner
             android:id="@+id/nearbyStopsDropDown"
-            android:layout_width="match_parent"
+            android:layout_width="343dp"
             android:layout_height="50dp"
+            android:layout_toStartOf="@+id/refreshButton"
+            android:layout_toLeftOf="@+id/refreshButton"
             android:prompt="@string/spinnerPrompt" />
-
-        <EditText
-            android:id="@+id/enterBusStop"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="50dp"
-            android:layout_marginTop="200dp"
-            android:layout_marginRight="50dp"
-            android:ems="10"
-            android:hint="Enter Bus Stop"
-            android:inputType="textPersonName"
-            android:textColor="#000000"
-            android:textSize="20dp" />
-
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="358dp"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="50dp"
-            android:text="TextView"
-            android:textAlignment="center"
-            android:textColor="#000000"
-            android:textSize="20sp"
-            android:visibility="gone" />
-
-        <Button
-            android:id="@+id/getLocationBtn"
-            android:layout_width="286dp"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="150dp"
-            android:background="#ffb130"
-            android:padding="10dp"
-            android:text="Get Current Location"
-            android:textColor="#0D47A1"
-            android:textSize="20dp"
-            android:textStyle="bold"
-            android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/locationText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="100dp"
-            android:text="Default"
-            android:textAlignment="center"
-            android:textColor="#000000"
-            android:textSize="17sp"
-            android:visibility="gone" />
-
-        <Button
-            android:id="@+id/getAllStopButton"
-            android:layout_width="200dp"
-            android:layout_height="50dp"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="210dp"
-            android:background="#ffb130"
-            android:onClick="getAllStops"
-            android:text="Get all stops"
-            android:textColor="#0D47A1"
-            android:textSize="20dp"
-            android:textStyle="bold"
-            android:visibility="gone" />
 
         <Button
             android:id="@+id/getJsonButton"
             android:layout_width="200dp"
             android:layout_height="50dp"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="260dp"
+            android:layout_below="@+id/inRangeStopGrid"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
             android:background="#ffb130"
             android:onClick="connectToMetro"
             android:text="search"
@@ -106,35 +44,20 @@
             android:textSize="20dp"
             android:textStyle="bold" />
 
-        <Button
-            android:id="@+id/button"
-            android:layout_width="200dp"
-            android:layout_height="50dp"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="320dp"
-            android:text="clear location"
-            android:textStyle="bold" />
+        <GridView
+            android:id="@+id/inRangeStopGrid"
+            android:layout_width="match_parent"
+            android:layout_height="466dp"
+            android:layout_below="@+id/nearbyStopsDropDown" />
 
-        <ScrollView
-            android:layout_width="375dp"
-            android:layout_height="340dp"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="260dp"
-            android:visibility="invisible">
+        <ImageButton
+            android:id="@+id/refreshButton"
+            android:layout_width="54dp"
+            android:layout_height="51dp"
+            android:layout_alignParentRight="true"
+            android:onClick="refresh"
+            android:src="@drawable/refresh" />
 
-            <TextView
-                android:id="@+id/jsonText"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_below="@id/getJsonButton"
-                android:layout_centerHorizontal="true"
-
-                android:background="#0b324d"
-                android:text="@string/defaultText"
-                android:textColor="#FFFFFF"
-                android:textSize="15dp" />
-
-        </ScrollView>
     </RelativeLayout>
 
 </android.widget.LinearLayout>

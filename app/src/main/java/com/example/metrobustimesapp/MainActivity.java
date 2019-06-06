@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.GridView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,72 +44,124 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     NetworkInfo netInfo;
-    LocationManager locationManager;
     static DatabaseHandler dbHandler;
     Spinner stopSpinner;
     SpinnerActivity spinnerListener;
-    ArrayAdapter<CharSequence> adapter;
+    ArrayAdapter<String> adapter;
     ConnectivityManager connectMan;
-    Button getLocationBtn;
-    TextView locationText;
     TextView jsonTxt;
-    TextView textView;
-    TextView editStop;
+    GridView inRangeGrid;
+    BusTimeListAdapter busTimeAdapter;
     String htmlText;
     String dbName;
     String busIDString;
     static String selectedBusStop; //bus stop selected from down down
     int busID;
+    private String[] stopsWithinRange;
+    ArrayList<BusTimeGUI> gridList;
 
-    private String[] close_busses_names;
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
         setContentView(R.layout.activity_main);
-        dbName = getString(R.string.DBName);
 
+        initTable();
+        initWidget();
+        initGrid();
+
+        connect();
+        update();
+    }
+
+    //initiate sql table
+    private void initTable(){
+        dbName = getString(R.string.DBName);
         busID = 1616;
         busIDString = Integer.toString(busID);
         dbHandler = new DatabaseHandler(this, dbName, null,1);
         dbHandler.queryData("CREATE TABLE IF NOT EXISTS "+dbName+"(ID INTEGER, HASHTABLE TEXT)");
+    }
 
-
+    /*
+    Input: None
+    Output: Initiates the variables
+    */
+    private void initWidget(){
         //Widget setup
-        //getLocationBtn = findViewById(R.id.getLocationBtn);
-        locationText = findViewById(R.id.locationText);
-        editStop = findViewById(R.id.enterBusStop);
-        textView = findViewById(R.id.textView);
-        jsonTxt = findViewById(R.id.jsonText);
         stopSpinner = findViewById(R.id.nearbyStopsDropDown);
-
-        //adapter for spinner setup
-        adapter = ArrayAdapter.createFromResource(this,
-                R.array.testList, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        stopSpinner.setAdapter(adapter);
+        inRangeGrid = findViewById(R.id.inRangeStopGrid);
         spinnerListener = new SpinnerActivity();
-        stopSpinner.setOnItemSelectedListener(spinnerListener);
+    }
 
+    //Init the gridview
+    private void initGrid(){
+        gridList = new ArrayList<>();
+        busTimeAdapter = new BusTimeListAdapter(this, R.layout.layout_gridview, gridList);
+        inRangeGrid.setAdapter(busTimeAdapter);
+    }
+
+    /*
+    Input: Called from MainActivity.onCreate
+    Output: Connects to the internet
+    */
+    private void connect(){
         //Internet stuff
         connectMan = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         netInfo = connectMan.getActiveNetworkInfo();
+    }
 
+    //Updates bus stops and spinner
+    private void update(){
+        gpsUpdate(); //Grabs the stops
+        spinnerUpdate(); //Put the stops into spinner
+        gridUpdate();
+    }
 
+    /*
+    Input: Called from MainActivity.onCreate
+    Output: Sets up the adapter for scroll down
+     */
+    private void spinnerUpdate(){
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, stopsWithinRange);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        stopSpinner.setAdapter(adapter);
+        stopSpinner.setOnItemSelectedListener(spinnerListener);
+    }
+
+    private void gpsUpdate(){
         //GPS stuff
         GPSHandler g = new GPSHandler(getApplicationContext());
         Location l = g.getLocation();
         if(l != null){
-            double lat = l.getLatitude();
-            double lon = l.getLongitude();
-            find_closest_bus(lat, lon);
-        }
+//            double lat = l.getLatitude();
+//            double lon = l.getLongitude();
+//            find_closest_bus(lat, lon);
 
-        // testing find_closest_bus
-        double fresca_lat = 37.001028;
-        double fresca_lng = -122.057713;
-        find_closest_bus(fresca_lat, fresca_lng);
+            //test
+            double fresca_lat = 37.001028;
+            double fresca_lng = -122.057713;
+            find_closest_bus(fresca_lat, fresca_lng);
+        }
+    }
+
+    private void gridUpdate(){
+        //grabbing data from sqlite
+        String sql = "SELECT * FROM "+dbName;
+        Cursor cursor = MainActivity.dbHandler.getData(sql);
+        gridList.clear();
+        while(cursor.moveToNext()){
+            int stopID = cursor.getInt(0);
+            HashMap<String, List<String>> hash = MainActivity.stringToHash(cursor.getString(1));
+
+            for(String key: hash.keySet()){ //going through every bus number
+                Log.d(key, ": "+hash.get(key));
+                String busTimes = ViewAllStopsActivity.formBusTimeString(hash, key);
+                gridList.add(new BusTimeGUI(stopID, busTimes, key));
+            }
+            adapter.notifyDataSetChanged();
+        }
     }
 
     private void find_closest_bus(double current_lat, double current_lng){
@@ -153,13 +207,17 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // spinnerList will contain an array of bus names from closeBusses
-        String[] spinnerList = new String[closeBusses.size()];
+        stopsWithinRange = new String[closeBusses.size()];
         int i = 0;
         for(Bus t : closeBusses){
-            Log.d("close bus", t.ID + " " + t.name);
-            spinnerList[i] = t.name; i++;
+            //Log.d("close bus", t.ID + " " + t.name);
+            stopsWithinRange[i] = t.name; i++;
         }
-        close_busses_names = spinnerList;
+        System.out.println(stopsWithinRange.length);
+        for(String s: stopsWithinRange){
+            System.out.println("god damn it");
+            System.out.println(s);
+        }
 
         if(closest_bus != null){
             Log.d("closest bus--", closest_bus.ID + " " + closest_bus.name);
@@ -228,13 +286,9 @@ public class MainActivity extends AppCompatActivity {
     protected void connectToMetro(View view){
         netInfo = connectMan.getActiveNetworkInfo();
 
-        String temp_busid = editStop.getText().toString();
+        String temp_busid = "";
         // TODO: check if busid is empty / valid
         // TODO: store all bus activity.
-        if(temp_busid.matches("")){
-            Toast.makeText(MainActivity.this, "MUST ENTER BUSID", Toast.LENGTH_LONG).show();
-            return;
-        }
         if (netInfo != null && netInfo.isConnected()) {
             //temp_busid = Integer.toString(i);
             temp_busid = String.format("%04d", 1616);
@@ -242,6 +296,10 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Toast.makeText(MainActivity.this, "NO INTERNET CONNECTION", Toast.LENGTH_LONG).show();
         }
+    }
+
+    public void refresh(View view) {
+        update();
     }
 
     //Author: Anthony
@@ -316,7 +374,6 @@ public class MainActivity extends AppCompatActivity {
             if (pd.isShowing()){
                 pd.dismiss();
             }
-            Log.d("debugging", result);
             try {
                 dbHandler.insertData(busID, result);
                 htmlText = result;
@@ -381,7 +438,7 @@ public class MainActivity extends AppCompatActivity {
         output = output.replace("Country Club ", "");
         output = output.replace("Mountain Store ", "");
 
-        Log.d("Parse", output);
+        //Log.d("Parse", output);
 
         String tempString = populateDB(output);
 
@@ -455,10 +512,10 @@ public class MainActivity extends AppCompatActivity {
         busses.put("19", Bus_19);
 
         String s = hashToString(busses);
-        Log.d("Bus 10", Bus_10.toString());
-        Log.d("Bus 16", Bus_16.toString());
-        Log.d("Bus 20", Bus_20.toString());
-        Log.d("Bus 20D", Bus_20D.toString());
+//        Log.d("Bus 10", Bus_10.toString());
+//        Log.d("Bus 16", Bus_16.toString());
+//        Log.d("Bus 20", Bus_20.toString());
+//        Log.d("Bus 20D", Bus_20D.toString());
         return s;
     }
 }
