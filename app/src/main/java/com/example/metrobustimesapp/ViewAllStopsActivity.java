@@ -1,13 +1,22 @@
 package com.example.metrobustimesapp;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.GridView;
+import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -23,16 +32,23 @@ public class ViewAllStopsActivity extends AppCompatActivity {
     BusTimeListAdapter adapter = null;
     String dbName;
 
+    private String[] stopList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_all_stops);
-        updateGrid();
+        //updateGrid();
+        populate_stopList();
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_dropdown_item_1line, stopList);
+        AutoCompleteTextView textView = findViewById(R.id.autoCompleteTextView);
+        textView.setAdapter(adapter);
     }
 
     protected void updateGrid(){
         dbName = getString(R.string.DBName);
-        gridView = findViewById(R.id.allStopGridView);
+        //gridView = findViewById(R.id.allStopGridView);
         list = new ArrayList<>();
         adapter = new BusTimeListAdapter(this, R.layout.layout_gridview,list);
         gridView.setAdapter(adapter);
@@ -127,4 +143,42 @@ public class ViewAllStopsActivity extends AppCompatActivity {
     }
 
 
+    public void searchClicked(View view) {
+        AutoCompleteTextView editText = findViewById(R.id.autoCompleteTextView);
+        if(Arrays.asList(stopList).contains(editText.getText().toString())){
+            // return to main
+            // still need to send to main editText.getText().toString()
+            Log.d("searchClicked", "Selected " + editText.getText().toString());
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+        }else{
+            Toast.makeText(ViewAllStopsActivity.this, "Must enter valid bus stop", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void populate_stopList(){
+        BufferedReader reader;
+        String[] line_split;
+
+        // Parse R.raw.businfo and store into busList
+        ArrayList<Bus> busList = new ArrayList<>();
+        try{
+            final InputStream file = getResources().openRawResource(R.raw.businfo);
+            reader = new BufferedReader(new InputStreamReader(file));
+            String line = reader.readLine();
+            while(line != null){
+                line_split = line.split("\\|");
+                busList.add(new Bus(line_split[0], line_split[1], line_split[2], line_split[3]));
+                line = reader.readLine();
+            }
+        } catch(IOException ioe){
+            ioe.printStackTrace();
+        }
+        stopList = new String[busList.size()];
+        int j = 0;
+        for(Bus t : busList){
+            stopList[j] = t.name;
+            j++;
+        }
+    }
 }
