@@ -35,7 +35,7 @@
             android:layout_below="@+id/inRangeStopGrid"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:background="#ffb130"
+            android:background="@drawable/rounded_button"
             android:onClick="onClickSearch"
             android:text="search"
             android:textColor="#0D47A1"
