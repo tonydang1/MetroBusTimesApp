@@ -64,16 +64,20 @@ public class ViewAllStopsActivity extends AppCompatActivity {
         int currHour = gcal.get(cal.HOUR_OF_DAY); //24 hours
         int currMin = (currHour*60)+gcal.get(cal.MINUTE);
         int busMin;
+        System.out.println("Current time: "+currHour+":"+currMin);
         String result="";
 
         //list setup
         List<String> busTimeList = hash.get(key);
 
         //loop through all bus times
-        for(int index=0; index<busTimeList.size()-2; index++){
+        for(int index=0; index<busTimeList.size()-1; index++){
             //need to extract the hour and min
             busMin = getMinAndHour(busTimeList.get(index));
-            if (busMin - currMin >= 0){
+
+            System.out.println(busMin+"-"+currMin+"="+(busMin-currMin));
+
+            if (busMin - currMin >= 0){ //time till next bus in minutes
                 result = (busMin-currMin) + ", " + (getMinAndHour(busTimeList.get(index+1))-currMin)+" min";
                 return result;
             } else if(index == busTimeList.size()-2){ //for the last bus, will show last bus time and first bus time of next day
@@ -92,7 +96,7 @@ public class ViewAllStopsActivity extends AppCompatActivity {
     protected static int getMinAndHour(String timeString){
 
         String[] timeArr;
-        String hourString, minString, time;
+        String time;
         int hour, min;
 
         String amPM = timeString.substring(timeString.length()-2);
@@ -107,7 +111,10 @@ public class ViewAllStopsActivity extends AppCompatActivity {
         if(amPM.matches("pm")){
             if(hour != 12)
                 hour += 12;
+        } else if(hour == 12) { //for 12am
+            hour += 12;
         }
+        System.out.print(hour+":"+min+amPM+": ");
 
         min += hour*60;
         return min;

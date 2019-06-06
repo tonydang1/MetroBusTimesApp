@@ -43,22 +43,20 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    int busID; //for debugging
+
     NetworkInfo netInfo;
     static DatabaseHandler dbHandler;
     Spinner stopSpinner;
-    SpinnerActivity spinnerListener;
     ArrayAdapter<String> adapter;
     ConnectivityManager connectMan;
-    TextView jsonTxt;
     GridView inRangeGrid;
     BusTimeListAdapter busTimeAdapter;
-    String htmlText;
     String dbName;
-    String busIDString;
     static String selectedBusStop; //bus stop selected from down down
-    int busID;
     private String[] stopsWithinRange;
     ArrayList<BusTimeGUI> gridList;
+    ArrayList<Bus> busList;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -67,39 +65,26 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().hide();
         setContentView(R.layout.activity_main);
 
-        initTable();
-        initWidget();
-        initGrid();
-
+        init();
         connect();
         update();
     }
 
-    //initiate sql table
-    private void initTable(){
+    //initiate stuff
+    private void init(){
         dbName = getString(R.string.DBName);
-        busID = 1616;
-        busIDString = Integer.toString(busID);
         dbHandler = new DatabaseHandler(this, dbName, null,1);
         dbHandler.queryData("CREATE TABLE IF NOT EXISTS "+dbName+"(ID INTEGER, HASHTABLE TEXT)");
-    }
 
-    /*
-    Input: None
-    Output: Initiates the variables
-    */
-    private void initWidget(){
         //Widget setup
         stopSpinner = findViewById(R.id.nearbyStopsDropDown);
         inRangeGrid = findViewById(R.id.inRangeStopGrid);
-        spinnerListener = new SpinnerActivity();
-    }
 
-    //Init the gridview
-    private void initGrid(){
         gridList = new ArrayList<>();
         busTimeAdapter = new BusTimeListAdapter(this, R.layout.layout_gridview, gridList);
         inRangeGrid.setAdapter(busTimeAdapter);
+
+        busList = new ArrayList<>();
     }
 
     /*
@@ -116,7 +101,6 @@ public class MainActivity extends AppCompatActivity {
     private void update(){
         gpsUpdate(); //Grabs the stops
         spinnerUpdate(); //Put the stops into spinner
-        gridUpdate();
     }
 
     /*
@@ -124,6 +108,20 @@ public class MainActivity extends AppCompatActivity {
     Output: Sets up the adapter for scroll down
      */
     private void spinnerUpdate(){
+        class SpinnerActivity extends Activity implements AdapterView.OnItemSelectedListener {
+
+            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                // An item was selected. You can retrieve the selected item using
+                //parent.getItemAtPosition(pos)
+                selectedBusStop = parent.getItemAtPosition(pos).toString();
+                gridUpdate();
+            }
+
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Another interface callback
+            }
+        }
+        SpinnerActivity spinnerListener = new SpinnerActivity();
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, stopsWithinRange);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         stopSpinner.setAdapter(adapter);
@@ -148,8 +146,25 @@ public class MainActivity extends AppCompatActivity {
 
     private void gridUpdate(){
         //grabbing data from sqlite
-        String sql = "SELECT * FROM "+dbName;
-        Cursor cursor = MainActivity.dbHandler.getData(sql);
+        try {
+            if (selectedBusStop.equals(null)) {
+                selectedBusStop = stopSpinner.getSelectedItem().toString();
+            }
+        } catch (Exception e) {
+            selectedBusStop = stopSpinner.getSelectedItem().toString();
+        }
+        String stopIDString = findStopID(selectedBusStop);
+
+        //TODO: Get all the info onto SQL
+        dbHandler.clean();
+        busID = Integer.parseInt(stopIDString);
+        connectToMetro();
+    }
+
+    private void populateGrid(){
+        String stopIDString = Integer.toString(busID);
+        String sql = "SELECT * FROM "+dbName+" WHERE BUSID ="+stopIDString; //grabs everything
+        Cursor cursor = dbHandler.getData(sql);
         gridList.clear();
         while(cursor.moveToNext()){
             int stopID = cursor.getInt(0);
@@ -158,10 +173,21 @@ public class MainActivity extends AppCompatActivity {
             for(String key: hash.keySet()){ //going through every bus number
                 Log.d(key, ": "+hash.get(key));
                 String busTimes = ViewAllStopsActivity.formBusTimeString(hash, key);
+//                if(busTimes != "N/A")
+//                    gridList.add(new BusTimeGUI(stopID, busTimes, key));
                 gridList.add(new BusTimeGUI(stopID, busTimes, key));
             }
             adapter.notifyDataSetChanged();
         }
+    }
+
+    private String findStopID(String stopName){
+        for(Bus bus: busList){
+            if (stopName.equals(bus.name)) {
+                return bus.ID;
+            }
+        }
+        return null;
     }
 
     private void find_closest_bus(double current_lat, double current_lng){
@@ -169,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
         String[] line_split;
 
         // Parse R.raw.businfo and store into busList
-        ArrayList<Bus> busList = new ArrayList<>();
+        busList.clear();
         try{
             final InputStream file = getResources().openRawResource(R.raw.businfo);
             reader = new BufferedReader(new InputStreamReader(file));
@@ -213,12 +239,6 @@ public class MainActivity extends AppCompatActivity {
             //Log.d("close bus", t.ID + " " + t.name);
             stopsWithinRange[i] = t.name; i++;
         }
-        System.out.println(stopsWithinRange.length);
-        for(String s: stopsWithinRange){
-            System.out.println("god damn it");
-            System.out.println(s);
-        }
-
         if(closest_bus != null){
             Log.d("closest bus--", closest_bus.ID + " " + closest_bus.name);
         }
@@ -244,14 +264,8 @@ public class MainActivity extends AppCompatActivity {
     // hagar_bus2   36.997611, -122.055053
 
 
-    //Author: Anthony
     //Input: Called from pressing getAllStopsButton in activity_main
     //Output: Sends you to ShowAllStops (will change to search bar)
-    public void getAllStops(View view) {
-        Intent intent = new Intent(this, ViewAllStopsActivity.class);
-        startActivity(intent);
-    }
-
     public void getAllStops(){
         Intent intent = new Intent(this, ViewAllStopsActivity.class);
         startActivity(intent);
@@ -283,7 +297,7 @@ public class MainActivity extends AppCompatActivity {
     //This is a test to see if you can get json files.
     //Right now it's hard coded to the 1616 bus stop ID. You can change it by changing the 15 that's
     //before wd to some other bus number like 16 or 20.
-    protected void connectToMetro(View view){
+    protected void connectToMetro(){
         netInfo = connectMan.getActiveNetworkInfo();
 
         String temp_busid = "";
@@ -291,11 +305,15 @@ public class MainActivity extends AppCompatActivity {
         // TODO: store all bus activity.
         if (netInfo != null && netInfo.isConnected()) {
             //temp_busid = Integer.toString(i);
-            temp_busid = String.format("%04d", 1616);
-            new OnlineMetroGetter().execute("https://www.scmtd.com/en/routes/schedule-by-stop/" + temp_busid + "/2019-05-17#tripDiv");
+            temp_busid = String.format("%04d", busID);
+            new OnlineMetroGetter().execute("https://www.scmtd.com/en/routes/schedule-by-stop/" + temp_busid + "/2019-06-06#tripDiv");
         } else {
             Toast.makeText(MainActivity.this, "NO INTERNET CONNECTION", Toast.LENGTH_LONG).show();
         }
+    }
+
+    protected void onClickSearch(View view){
+        connectToMetro();
     }
 
     public void refresh(View view) {
@@ -303,7 +321,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //Author: Anthony
-    //Object for connecting to metro website and grabbing json/xml file(hopefully).
+    //Object for connecting to metro website
     private class OnlineMetroGetter extends AsyncTask<String, String, String> {
         private ProgressDialog pd;
 
@@ -327,7 +345,6 @@ public class MainActivity extends AppCompatActivity {
                 URL url = new URL(params[0]);
                 connection = (HttpURLConnection) url.openConnection();
                 connection.connect();
-
 
                 //parsing info setup
                 InputStream stream = connection.getInputStream();
@@ -376,11 +393,10 @@ public class MainActivity extends AppCompatActivity {
             }
             try {
                 dbHandler.insertData(busID, result);
-                htmlText = result;
-                jsonTxt.setText(result);
-                getAllStops();
+                populateGrid();
             } catch (Exception e){
-                Toast.makeText(MainActivity.this, "Invalid Stop ID", Toast.LENGTH_LONG).show();
+                e.printStackTrace();
+                Toast.makeText(MainActivity.this, "Something went wrong", Toast.LENGTH_LONG).show();
             }
         }
     }
