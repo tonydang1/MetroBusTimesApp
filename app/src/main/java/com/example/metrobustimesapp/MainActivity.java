@@ -1,5 +1,6 @@
 package com.example.metrobustimesapp;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -8,6 +9,7 @@ import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -44,11 +46,12 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     int busID; //for debugging
+    int index = 0;
 
     NetworkInfo netInfo;
     static DatabaseHandler dbHandler;
     Spinner stopSpinner;
-    ArrayAdapter<String> adapter;
+    ArrayAdapter<String> spinnerAdapter;
     ConnectivityManager connectMan;
     GridView inRangeGrid;
     BusTimeListAdapter busTimeAdapter;
@@ -65,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().hide();
         setContentView(R.layout.activity_main);
 
+        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
         init();
         connect();
         update();
@@ -122,9 +126,9 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         SpinnerActivity spinnerListener = new SpinnerActivity();
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, stopsWithinRange);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        stopSpinner.setAdapter(adapter);
+        spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, stopsWithinRange);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        stopSpinner.setAdapter(spinnerAdapter);
         stopSpinner.setOnItemSelectedListener(spinnerListener);
     }
 
@@ -133,14 +137,16 @@ public class MainActivity extends AppCompatActivity {
         GPSHandler g = new GPSHandler(getApplicationContext());
         Location l = g.getLocation();
         if(l != null){
-//            double lat = l.getLatitude();
-//            double lon = l.getLongitude();
-//            find_closest_bus(lat, lon);
+            double lat = l.getLatitude();
+            double lon = l.getLongitude();
+            find_closest_bus(lat, lon);
 
             //test
-            double fresca_lat = 37.001028;
-            double fresca_lng = -122.057713;
-            find_closest_bus(fresca_lat, fresca_lng);
+//            double fresca_lat = 37.001028;
+//            double fresca_lng = -122.057713;
+//            find_closest_bus(fresca_lat, fresca_lng);
+        } else {
+            Log.d("gpsUpdate()", "Something wrong with GPS");
         }
     }
 
@@ -156,9 +162,8 @@ public class MainActivity extends AppCompatActivity {
         String stopIDString = findStopID(selectedBusStop);
 
         //TODO: Get all the info onto SQL
-        dbHandler.clean();
         busID = Integer.parseInt(stopIDString);
-        connectToMetro();
+        populateGrid();
     }
 
     private void populateGrid(){
@@ -168,16 +173,16 @@ public class MainActivity extends AppCompatActivity {
         gridList.clear();
         while(cursor.moveToNext()){
             int stopID = cursor.getInt(0);
+            Log.d("populateGrid",cursor.getString(0));
             HashMap<String, List<String>> hash = MainActivity.stringToHash(cursor.getString(1));
 
             for(String key: hash.keySet()){ //going through every bus number
                 Log.d(key, ": "+hash.get(key));
                 String busTimes = ViewAllStopsActivity.formBusTimeString(hash, key);
-//                if(busTimes != "N/A")
-//                    gridList.add(new BusTimeGUI(stopID, busTimes, key));
-                gridList.add(new BusTimeGUI(stopID, busTimes, key));
+                if(busTimes != "N/A")
+                    gridList.add(new BusTimeGUI(stopID, busTimes, key));
             }
-            adapter.notifyDataSetChanged();
+            busTimeAdapter.notifyDataSetChanged();
         }
     }
 
@@ -285,13 +290,31 @@ public class MainActivity extends AppCompatActivity {
     //Output: Decoded hashtable
     //Decodes the json and turns it back into a hashtable
     protected static HashMap<String, List<String>> stringToHash(String stringHash){
+        Log.d("stringToHash", stringHash);
         Gson gson = new Gson();
         Type type = new TypeToken<HashMap<String,ArrayList<String>>>() {}.getType();
         HashMap<String, List<String>> hash = gson.fromJson(stringHash, type);
         return hash;
     }
 
-    //Author: Anthony
+    protected void onClickSearch(View view){
+
+        for(int i=1000; i<3000; i++) {
+            busID = i;
+            connectToMetro();
+        }
+//        busID = 1617;
+//        connectToMetro();
+    }
+
+    public void refresh(View view) {
+        update();
+    }
+
+    public void addToDB(String result){
+
+    }
+
     //Input: Called from getJsonButton
     //Output: Should transfer some kind of information to some database (WIP)
     //This is a test to see if you can get json files.
@@ -306,20 +329,11 @@ public class MainActivity extends AppCompatActivity {
         if (netInfo != null && netInfo.isConnected()) {
             //temp_busid = Integer.toString(i);
             temp_busid = String.format("%04d", busID);
-            new OnlineMetroGetter().execute("https://www.scmtd.com/en/routes/schedule-by-stop/" + temp_busid + "/2019-06-06#tripDiv");
+            new OnlineMetroGetter().execute("https://www.scmtd.com/en/routes/schedule-by-stop/" + temp_busid + "/2019-06-06#tripDiv", temp_busid);
         } else {
             Toast.makeText(MainActivity.this, "NO INTERNET CONNECTION", Toast.LENGTH_LONG).show();
         }
     }
-
-    protected void onClickSearch(View view){
-        connectToMetro();
-    }
-
-    public void refresh(View view) {
-        update();
-    }
-
     //Author: Anthony
     //Object for connecting to metro website
     private class OnlineMetroGetter extends AsyncTask<String, String, String> {
@@ -330,7 +344,7 @@ public class MainActivity extends AppCompatActivity {
             pd = new ProgressDialog(MainActivity.this);
             pd.setMessage("Please wait");
             pd.setCancelable(false);
-            pd.show();
+            //pd.show();
         }
 
         @Override
@@ -339,6 +353,8 @@ public class MainActivity extends AppCompatActivity {
             HttpURLConnection connection = null;
             BufferedReader reader = null;
             String stopRow;
+            String backgroundStopID = params[1];
+            Log.d("doInBackGround","============="+backgroundStopID+"===============");
 
             try {
                 //connecting
@@ -361,9 +377,9 @@ public class MainActivity extends AppCompatActivity {
                 stopRow = element.text();
 
                 String out = parseElement(stopRow);
+                out = backgroundStopID+" "+out;
+                Log.d("doInBackground", "out is " + out);
                 return out;
-
-
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -392,8 +408,8 @@ public class MainActivity extends AppCompatActivity {
                 pd.dismiss();
             }
             try {
-                dbHandler.insertData(busID, result);
-                populateGrid();
+                String[] arr = result.split("\\s+"); //arr[0] is id, arr[1] is result
+                dbHandler.insertData(Integer.parseInt(arr[0]), arr[1]);
             } catch (Exception e){
                 e.printStackTrace();
                 Toast.makeText(MainActivity.this, "Something went wrong", Toast.LENGTH_LONG).show();
