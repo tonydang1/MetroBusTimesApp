@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.GridView;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -35,7 +36,7 @@ public class ViewAllStopsActivity extends AppCompatActivity {
     BusTimeListAdapter adapter = null;
     String dbName;
     EditText searchBar;
-    Button searchButton;
+    ImageButton searchButton;
     String stopName;
     ArrayList<Bus> busList;
 
