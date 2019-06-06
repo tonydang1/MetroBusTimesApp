@@ -235,16 +235,20 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        // spinnerList will contain an array of bus names from closeBusses
-        stopsWithinRange = new String[closeBusses.size()];
-        int i = 0;
-        for(Bus t : closeBusses){
-            //Log.d("close bus", t.ID + " " + t.name);
-            stopsWithinRange[i] = t.name; i++;
-        }
         if(closest_bus != null){
             Log.d("closest bus--", closest_bus.ID + " " + closest_bus.name);
-        }
+            stopsWithinRange = new String[closeBusses.size()];
+            // populate first index of spinner with closest
+            stopsWithinRange[0] = closest_bus.name;
+            // then populate with remaining stops within range
+            int i = 1;
+            for(Bus t : closeBusses){
+                if(t.ID != closest_bus.ID) {
+                    stopsWithinRange[i] = t.name;
+                    i++;
+                }
+            }
+        }//if
     }
 
     private double meterDistanceBetweenPoints(double lat_a, double lng_a, double lat_b, double lng_b) {

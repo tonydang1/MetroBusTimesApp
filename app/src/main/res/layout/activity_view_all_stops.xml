@@ -6,14 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".ViewAllStopsActivity">
 
-    <EditText
-        android:id="@+id/busStopSearch"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_alignParentLeft="true"
-        android:layout_toLeftOf="@+id/viewAllButton"
-        android:hint="Enter stop id" />
-
     <Button
         android:id="@+id/viewAllButton"
         android:layout_width="85dp"
@@ -22,10 +14,25 @@
         android:text="Search"
         android:onClick="beginSearch"/>
 
-    <GridView
-        android:id="@+id/allStopGridView"
+    <AutoCompleteTextView
+        android:id="@+id/autoCompleteTextView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="75dp"/>
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/viewAllButton"
+        android:hint="Enter Bus Stop"
+        />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Search"
+        android:layout_marginTop="125dp"
+        android:layout_centerHorizontal="true"
+        android:onClick="searchClicked"
+        android:drawableLeft="@android:drawable/ic_menu_search"
+        />
+
+>>>>>>> ad5a97fbe6051b944a1fea513808c9787ca4531d
 
 </RelativeLayout>
