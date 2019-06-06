@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     String busIDString;
     int busID;
 
+    private String[] close_busses_names;
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,14 +75,6 @@ public class MainActivity extends AppCompatActivity {
         dbHandler = new DatabaseHandler(this, dbName, null,1);
         dbHandler.queryData("CREATE TABLE IF NOT EXISTS "+dbName+"(ID INTEGER, HASHTABLE TEXT)");
 
-        double mch_lat = 36.996165;
-        double mch_long =  -122.058873;
-        double hagar_bus_lat = 36.996801;
-        double hagar_bus_long = -122.055408;
-
-        double d = Math.acos(Math.sin(mch_lat)*Math.sin(hagar_bus_lat)+Math.cos(mch_lat)*Math.cos(hagar_bus_lat)*Math.cos(mch_long - hagar_bus_long));
-
-        double distance_km = 6371 * d;
 
         //Widget setup
         //getLocationBtn = findViewById(R.id.getLocationBtn);
@@ -94,26 +87,88 @@ public class MainActivity extends AppCompatActivity {
         connectMan = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         netInfo = connectMan.getActiveNetworkInfo();
 
-        String string_d = Double.toString(distance_km);
-        textView.setText("Distance in km: "+ string_d);
 
-        getLocationBtn = findViewById(R.id.button);
-        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},123);
-        getLocationBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                GPSHandler g = new GPSHandler(getApplicationContext());
-                Location l = g.getLocation();
-                if(l != null){
-                    double lat = l.getLatitude();
-                    double lon = l.getLongitude();
-                    Toast.makeText(getApplicationContext(), "LAT: "+ lat+ "\n LON: "+ lon, Toast.LENGTH_LONG).show();
-                }
-            }
-        });
+        //GPS stuff
+        GPSHandler g = new GPSHandler(getApplicationContext());
+        Location l = g.getLocation();
+        if(l != null){
+            double lat = l.getLatitude();
+            double lon = l.getLongitude();
+            find_closest_bus(lat, lon);
+        }
+
+        // testing find_closest_bus
+        double fresca_lat = 37.001028;
+        double fresca_lng = -122.057713;
+        find_closest_bus(fresca_lat, fresca_lng);
 
     }
+    private void find_closest_bus(double current_lat, double current_lng){
+        BufferedReader reader;
+        String[] line_split;
 
+        // Parse R.raw.businfo and store into busList
+        ArrayList<Bus> busList = new ArrayList<>();
+        try{
+            final InputStream file = getResources().openRawResource(R.raw.businfo);
+            reader = new BufferedReader(new InputStreamReader(file));
+            String line = reader.readLine();
+            while(line != null){
+                line_split = line.split("\\|");
+                busList.add(new Bus(line_split[0], line_split[1], line_split[2], line_split[3]));
+                line = reader.readLine();
+            }
+        } catch(IOException ioe){
+            ioe.printStackTrace();
+        }
+
+        // DEBUG, prints busList, should be populated from R.raw.businfo
+        for(Bus t : busList){
+            Log.d("BusInfo", t.ID + " " + t.lat + " " + t.lon);
+        }
+
+        // closeBusses will contain the busses within 700 meters
+        // closest_bus will have the closest id bus stop
+        ArrayList<Bus> closeBusses = new ArrayList<>();
+
+        Bus closest_bus = null;
+        double min_d = 2000;
+        for(Bus t : busList){
+            double d = meterDistanceBetweenPoints(current_lat, current_lng, Double.parseDouble(t.lat), Double.parseDouble(t.lon));
+            if(d <= 700){
+                closeBusses.add(t);
+                if(d < min_d){
+                    min_d = d;
+                    closest_bus = t;
+                    Log.d("MIN", min_d + " " + t.ID);
+                }
+            }
+        }
+
+        // spinnerList will contain an array of bus names from closeBusses
+        String[] spinnerList = new String[closeBusses.size()];
+        int i = 0;
+        for(Bus t : closeBusses){
+            Log.d("close bus", t.ID + " " + t.name);
+            spinnerList[i] = t.name; i++;
+        }
+        close_busses_names = spinnerList;
+
+        if(closest_bus != null){
+            Log.d("closest bus--", closest_bus.ID + " " + closest_bus.name);
+        }
+    }
+
+    private double meterDistanceBetweenPoints(double lat_a, double lng_a, double lat_b, double lng_b) {
+        Location selected_location=new Location("locationA");
+        selected_location.setLatitude(lat_a);
+        selected_location.setLongitude(lng_a);
+        Location near_locations=new Location("locationB");
+        near_locations.setLatitude(lat_b);
+        near_locations.setLongitude(lng_b);
+
+        return selected_location.distanceTo(near_locations);
+    }
 
     // location lat lng
     // sne          36.999212, -122.060613
