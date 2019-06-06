@@ -5,6 +5,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridView;
 
 import java.util.ArrayList;
@@ -22,12 +24,17 @@ public class ViewAllStopsActivity extends AppCompatActivity {
     ArrayList<BusTimeGUI> list;
     BusTimeListAdapter adapter = null;
     String dbName;
+    EditText searchBar;
+    Button searchButton;
+    String stopName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_all_stops);
         updateGrid();
+        searchBar=findViewById(R.id.busStopSearch);
+        searchButton=findViewById(R.id.viewAllButton);
     }
 
     protected void updateGrid(){
@@ -39,9 +46,17 @@ public class ViewAllStopsActivity extends AppCompatActivity {
         populateGrid();
     }
 
+    //When user presses search button, take what they have on edit text and
+    //put it on the gridview
+    protected void beginSearch(View view){
+        stopName = searchBar.getText().toString();
+        updateGrid();
+    }
+
     protected void populateGrid(){
         //grabbing data from sqlite
-        String sql = "SELECT * FROM "+dbName;
+        String stopIDString = findStopID(stopName);
+        String sql = "SELECT * FROM "+dbName+" WHERE BUSID ="+stopIDString; //grabs everything
         Cursor cursor = MainActivity.dbHandler.getData(sql);
         list.clear();
         while(cursor.moveToNext()){
@@ -55,6 +70,15 @@ public class ViewAllStopsActivity extends AppCompatActivity {
             }
             adapter.notifyDataSetChanged();
         }
+    }
+
+    private String findStopID(String stopName){
+        for(Bus bus: busList){
+            if (stopName.equals(bus.name)) {
+                return bus.ID;
+            }
+        }
+        return null;
     }
 
     //Input: HashMap, key(should be bus number)
@@ -125,6 +149,4 @@ public class ViewAllStopsActivity extends AppCompatActivity {
         min += hour*60;
         return min;
     }
-
-
 }

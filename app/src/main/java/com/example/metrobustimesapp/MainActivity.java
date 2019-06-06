@@ -160,8 +160,6 @@ public class MainActivity extends AppCompatActivity {
             selectedBusStop = stopSpinner.getSelectedItem().toString();
         }
         String stopIDString = findStopID(selectedBusStop);
-
-        //TODO: Get all the info onto SQL
         busID = Integer.parseInt(stopIDString);
         populateGrid();
     }
@@ -309,10 +307,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void refresh(View view) {
         update();
-    }
-
-    public void addToDB(String result){
-
     }
 
     //Input: Called from getJsonButton
