@@ -30,22 +30,27 @@ import static java.util.Calendar.HOUR_OF_DAY;
 public class ViewAllStopsActivity extends AppCompatActivity {
 
     GridView gridView;
+    BusTimeListAdapter gridAdapter;
     ArrayList<BusTimeGUI> list;
     BusTimeListAdapter adapter = null;
     String dbName;
     EditText searchBar;
     Button searchButton;
     String stopName;
+    ArrayList<Bus> busList;
 
     private String[] stopList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_all_stops);
-        updateGrid();
-        searchBar=findViewById(R.id.busStopSearch);
-        searchButton=findViewById(R.id.viewAllButton);
 
+        Intent intent = getIntent();
+        Bundle extra = intent.getExtras();
+        busList = (ArrayList<Bus>) extra.getSerializable("busList");
+        searchBar = findViewById(R.id.autoCompleteTextView);
+        searchButton=findViewById(R.id.viewAllButton);
+        gridView = findViewById(R.id.gridView);
         populate_stopList();
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
@@ -58,8 +63,8 @@ public class ViewAllStopsActivity extends AppCompatActivity {
         dbName = getString(R.string.DBName);
         //gridView = findViewById(R.id.allStopGridView);
         list = new ArrayList<>();
-        adapter = new BusTimeListAdapter(this, R.layout.layout_gridview,list);
-        gridView.setAdapter(adapter);
+        gridAdapter = new BusTimeListAdapter(this, R.layout.layout_gridview,list);
+        gridView.setAdapter(gridAdapter);
         populateGrid();
     }
 
@@ -83,9 +88,10 @@ public class ViewAllStopsActivity extends AppCompatActivity {
             for(String key: hash.keySet()){ //going through every bus number
                 Log.d(key, ": "+hash.get(key));
                 String busTimes = formBusTimeString(hash, key);
-                list.add(new BusTimeGUI(stopID, busTimes, key));
+                if(!busTimes.equals("N/A"))
+                    list.add(new BusTimeGUI(stopID, busTimes, key));
             }
-            adapter.notifyDataSetChanged();
+            gridAdapter.notifyDataSetChanged();
         }
     }
 

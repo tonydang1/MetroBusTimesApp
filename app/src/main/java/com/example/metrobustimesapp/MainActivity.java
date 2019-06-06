@@ -35,6 +35,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -271,11 +272,12 @@ public class MainActivity extends AppCompatActivity {
     // hagar_bus2   36.997611, -122.055053
 
 
-    //Input: Called from pressing getAllStopsButton in activity_main
-    //Output: Sends you to ShowAllStops (will change to search bar)
+    //Get all stops
     public void getAllStops(){
-        Intent intent = new Intent(this, ViewAllStopsActivity.class);
-        startActivity(intent);
+        for(int i=1000; i<3000; i++) {
+            busID = i;
+            connectToMetro();
+        }
     }
 
     //Author: Anthony
@@ -300,11 +302,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     protected void onClickSearch(View view){
-        getAllStops();
-//        for(int i=1000; i<3000; i++) {
-//            busID = i;
-//            connectToMetro();
-//        }
+        //getAllStops();
+        Intent intent = new Intent(this, ViewAllStopsActivity.class);
+        intent.putExtra("busList", (Serializable) busList);
+        startActivity(intent);
+//
 //        busID = 1617;
 //        connectToMetro();]
     }

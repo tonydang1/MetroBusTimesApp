@@ -6,32 +6,29 @@
     android:layout_height="match_parent"
     tools:context=".ViewAllStopsActivity">
 
-    <Button
-        android:id="@+id/viewAllButton"
-        android:layout_width="85dp"
-        android:layout_height="50dp"
-        android:layout_alignParentRight="true"
-        android:text="Search"
-        android:onClick="beginSearch"/>
-
     <AutoCompleteTextView
         android:id="@+id/autoCompleteTextView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="53dp"
+        android:layout_alignTop="@+id/viewAllButton"
         android:layout_toLeftOf="@+id/viewAllButton"
-        android:hint="Enter Bus Stop"
-        />
+        android:hint="Enter stop name" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/viewAllButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_alignParentRight="true"
         android:text="Search"
-        android:layout_marginTop="125dp"
-        android:layout_centerHorizontal="true"
-        android:onClick="searchClicked"
-        android:drawableLeft="@android:drawable/ic_menu_search"
-        />
+        android:onClick="beginSearch"
+        android:drawableLeft="@android:drawable/ic_menu_search" />
+
+    <GridView
+        android:id="@+id/gridView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/viewAllButton"/>
 
 >>>>>>> ad5a97fbe6051b944a1fea513808c9787ca4531d
 

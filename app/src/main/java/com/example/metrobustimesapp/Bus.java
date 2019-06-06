@@ -1,6 +1,6 @@
 package com.example.metrobustimesapp;
 
-public class Bus {
+public class Bus implements java.io.Serializable {
     String ID;
     String name;
     String lat;
