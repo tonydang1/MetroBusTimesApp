@@ -27,13 +27,19 @@ public class ViewAllStopsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_all_stops);
+        updateGrid();
+    }
 
+    protected void updateGrid(){
         dbName = getString(R.string.DBName);
         gridView = findViewById(R.id.allStopGridView);
         list = new ArrayList<>();
         adapter = new BusTimeListAdapter(this, R.layout.layout_gridview,list);
         gridView.setAdapter(adapter);
+        populateGrid();
+    }
 
+    protected void populateGrid(){
         //grabbing data from sqlite
         String sql = "SELECT * FROM "+dbName;
         Cursor cursor = MainActivity.dbHandler.getData(sql);

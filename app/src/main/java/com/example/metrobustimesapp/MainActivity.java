@@ -298,13 +298,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     protected void onClickSearch(View view){
-
-        for(int i=1000; i<3000; i++) {
-            busID = i;
-            connectToMetro();
-        }
+        getAllStops();
+//        for(int i=1000; i<3000; i++) {
+//            busID = i;
+//            connectToMetro();
+//        }
 //        busID = 1617;
-//        connectToMetro();
+//        connectToMetro();]
     }
 
     public void refresh(View view) {
