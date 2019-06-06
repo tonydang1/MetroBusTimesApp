@@ -1,36 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.widget.LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
     tools:context=".ViewAllStopsActivity">
 
-    <AutoCompleteTextView
-        android:id="@+id/autoCompleteTextView"
+    <ImageView
+        android:id="@+id/imageView"
         android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:layout_alignTop="@+id/viewAllButton"
-        android:layout_toLeftOf="@+id/viewAllButton"
-        android:hint="Enter stop name" />
+        android:layout_height="86dp"
+        android:scaleType="fitXY"
+        app:srcCompat="@drawable/mbt" />
 
-    <ImageButton
-        android:id="@+id/viewAllButton"
-        android:layout_width="60dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="30dp"
-        android:layout_alignParentRight="true"
-        android:text="Search"
-        android:onClick="beginSearch"
-        android:background="@drawable/rounded_button"
-        android:src="@android:drawable/ic_menu_search" />
-
-    <GridView
-        android:id="@+id/gridView"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/viewAllButton"/>
+        android:layout_weight="0"
+        android:orientation="vertical">
 
->>>>>>> ad5a97fbe6051b944a1fea513808c9787ca4531d
+        <AutoCompleteTextView
+            android:id="@+id/autoCompleteTextView"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:layout_toLeftOf="@+id/viewAllButton"
+            android:hint="Enter stop name" />
 
-</RelativeLayout>
+        <ImageButton
+            android:id="@+id/viewAllButton"
+            android:layout_width="50dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/rounded_button"
+            android:onClick="beginSearch"
+            android:src="@android:drawable/ic_menu_search"
+            android:text="Search" />
+
+        <GridView
+            android:id="@+id/gridView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/viewAllButton" />
+
+    </RelativeLayout>
+    >>>>>>> ad5a97fbe6051b944a1fea513808c9787ca4531d
+
+</android.widget.LinearLayout>
