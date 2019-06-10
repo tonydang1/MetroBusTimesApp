@@ -74,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
         ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
         init();
         connect();
+        gpsUpdate();
         if(selectedBusStop != null){
             update();
         }
