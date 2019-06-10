@@ -41,6 +41,7 @@ public class ViewAllStopsActivity extends AppCompatActivity {
     ArrayList<Bus> busList;
 
     private String[] stopList;
+    private String[] stopIDList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -207,9 +208,11 @@ public class ViewAllStopsActivity extends AppCompatActivity {
             ioe.printStackTrace();
         }
         stopList = new String[busList.size()];
+        stopIDList = new String[busList.size()];
         int j = 0;
         for(Bus t : busList){
             stopList[j] = t.name;
+            stopIDList[j] = t.ID;
             j++;
         }
     }

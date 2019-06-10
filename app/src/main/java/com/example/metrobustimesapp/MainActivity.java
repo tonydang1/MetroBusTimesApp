@@ -62,6 +62,8 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<BusTimeGUI> gridList;
     ArrayList<Bus> busList;
 
+    private String[] stopIDList;
+
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +74,9 @@ public class MainActivity extends AppCompatActivity {
         ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
         init();
         connect();
-        update();
+        if(selectedBusStop != null){
+            update();
+        }
     }
 
     //initiate stuff
@@ -222,9 +226,14 @@ public class MainActivity extends AppCompatActivity {
         // closest_bus will have the closest id bus stop
         ArrayList<Bus> closeBusses = new ArrayList<>();
 
+        stopIDList = new String[busList.size()];
+        int j = 0;
+
         Bus closest_bus = null;
         double min_d = 2000;
         for(Bus t : busList){
+            stopIDList[j] = t.ID;
+            j++;
             double d = meterDistanceBetweenPoints(current_lat, current_lng, Double.parseDouble(t.lat), Double.parseDouble(t.lon));
             if(d <= 700){
                 closeBusses.add(t);
@@ -276,6 +285,14 @@ public class MainActivity extends AppCompatActivity {
     public void getAllStops(){
         for(int i=1000; i<3000; i++) {
             busID = i;
+            connectToMetro();
+        }
+    }
+
+    //Get all stops that we have within our businfo file, better for testing
+    public void getAllStopsForTA(View view) {
+        for(int i =0; i < stopIDList.length; i++){
+            busID = Integer.parseInt(stopIDList[i]);
             connectToMetro();
         }
     }
@@ -334,6 +351,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "NO INTERNET CONNECTION", Toast.LENGTH_LONG).show();
         }
     }
+
     //Author: Anthony
     //Object for connecting to metro website
     private class OnlineMetroGetter extends AsyncTask<String, String, String> {
